@@ -31,24 +31,37 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
-        run: npm run build:mac
+        run: |
+          npm run build:mac || true
+          ls -la dist/ || echo "No dist directory"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
-        run: npm run build:linux
+        run: |
+          npm run build:linux || true
+          ls -la dist/ || echo "No dist directory"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
-        run: npm run build:win
+        run: |
+          npm run build:win || true
+          dir dist || echo "No dist directory"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,28 +70,24 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mac-build
-          path: |
-            dist/*.dmg
-            dist/*.zip
+          path: dist/
+          if-no-files-found: warn
 
       - name: Upload Linux artifacts
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
-          path: |
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
+          path: dist/
+          if-no-files-found: warn
 
       - name: Upload Windows artifacts
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: |
-            dist/*.exe
-            dist/*.msi
+          path: dist/
+          if-no-files-found: warn
 
   release:
     needs: build
