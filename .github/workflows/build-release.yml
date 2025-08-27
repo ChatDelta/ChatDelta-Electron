@@ -107,6 +107,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Check if release exists, delete if it does (for re-runs)
+          gh release view ${{ github.ref_name }} && gh release delete ${{ github.ref_name }} -y || true
+          
           # Create release
           gh release create ${{ github.ref_name }} \
             --title "ChatDelta ${{ github.ref_name }}" \
