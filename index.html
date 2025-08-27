@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatDelta</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>ChatDelta</h1>
+            <p class="subtitle">Compare AI Responses Side-by-Side</p>
+        </header>
+
+        <div class="chat-columns">
+            <div class="chat-column" id="chatgpt-column" data-provider="chatgpt">
+                <div class="column-header">
+                    <div class="provider-icon">🤖</div>
+                    <h3>ChatGPT</h3>
+                    <div class="status-indicator" id="chatgpt-status"></div>
+                </div>
+                <div class="chat-content" id="chatgpt-content">
+                    <div class="empty-state">No messages yet</div>
+                </div>
+            </div>
+
+            <div class="chat-column" id="claude-column" data-provider="claude">
+                <div class="column-header">
+                    <div class="provider-icon">🧠</div>
+                    <h3>Claude</h3>
+                    <div class="status-indicator" id="claude-status"></div>
+                </div>
+                <div class="chat-content" id="claude-content">
+                    <div class="empty-state">No messages yet</div>
+                </div>
+            </div>
+
+            <div class="chat-column" id="gemini-column" data-provider="gemini">
+                <div class="column-header">
+                    <div class="provider-icon">💎</div>
+                    <h3>Gemini</h3>
+                    <div class="status-indicator" id="gemini-status"></div>
+                </div>
+                <div class="chat-content" id="gemini-content">
+                    <div class="empty-state">No messages yet</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="delta-window">
+            <div class="delta-header">
+                <h3>Delta Analysis</h3>
+                <div class="delta-indicator"></div>
+            </div>
+            <div class="delta-content" id="delta-content">
+                <div class="empty-state">Send a prompt to see response differences</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <textarea 
+                id="prompt-input" 
+                class="prompt-input" 
+                placeholder="Enter your prompt here..."
+                rows="3"
+            ></textarea>
+            <button id="send-button" class="send-button">
+                <span class="send-icon">➤</span>
+                <span class="send-text">Send</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

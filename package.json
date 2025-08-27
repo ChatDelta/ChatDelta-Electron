@@ -1,0 +1,26 @@
+{
+  "name": "ChatDelta",
+  "productName": "ChatDelta",
+  "version": "1.0.0",
+  "description": "An Electron version of ChatDelta",
+  "keywords": [],
+  "homepage": "https://github.com/ChatDelta/ChatDelta-Electron#readme",
+  "bugs": {
+    "url": "https://github.com/ChatDelta/ChatDelta-Electron/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChatDelta/ChatDelta-Electron.git"
+  },
+  "license": "MIT",
+  "author": "David Liedle <david.liedle@protonmail.com>",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^37.3.1"
+  }
+}
