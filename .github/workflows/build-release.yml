@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload macOS artifacts
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mac-build
           path: |
@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload Linux artifacts
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-build
           path: |
@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload Windows artifacts
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: |
@@ -87,69 +87,33 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: release-artifacts
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create Release and Upload Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ChatDelta ${{ github.ref }}
-          body: |
-            ## ChatDelta Release
-            
-            ### Downloads
-            - **Windows**: Download the `.exe` installer
-            - **macOS**: Download the `.dmg` or `.app.zip` file
-            - **Linux**: Download the `.AppImage`, `.deb`, or `.rpm` file
-            
-            ### Installation
-            - **Windows**: Run the `.exe` installer
-            - **macOS**: Open the `.dmg` and drag ChatDelta to Applications
-            - **Linux**: Make the `.AppImage` executable and run it, or install the `.deb`/`.rpm` package
-            
-            See the [README](https://github.com/ChatDelta/ChatDelta-Electron#readme) for configuration instructions.
-          draft: false
-          prerelease: false
+        run: |
+          # Create release
+          gh release create ${{ github.ref_name }} \
+            --title "ChatDelta ${{ github.ref_name }}" \
+            --notes "## ChatDelta Release
 
-      - name: Upload Release Assets
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs').promises;
-            const path = require('path');
-            
-            const releaseId = ${{ steps.create_release.outputs.id }};
-            const artifactsDir = 'release-artifacts';
-            
-            async function uploadAssets(dir) {
-              const files = await fs.readdir(dir, { withFileTypes: true });
-              
-              for (const file of files) {
-                const filePath = path.join(dir, file.name);
-                
-                if (file.isDirectory()) {
-                  await uploadAssets(filePath);
-                } else if (file.name.match(/\.(dmg|zip|exe|msi|AppImage|deb|rpm)$/)) {
-                  console.log(`Uploading ${file.name}`);
-                  const data = await fs.readFile(filePath);
-                  
-                  await github.rest.repos.uploadReleaseAsset({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    release_id: releaseId,
-                    name: file.name,
-                    data: data
-                  });
-                }
-              }
-            }
-            
-            await uploadAssets(artifactsDir);
+          ### Downloads
+          - **Windows**: Download the \`.exe\` installer
+          - **macOS**: Download the \`.dmg\` or \`.app.zip\` file
+          - **Linux**: Download the \`.AppImage\`, \`.deb\`, or \`.rpm\` file
+
+          ### Installation
+          - **Windows**: Run the \`.exe\` installer
+          - **macOS**: Open the \`.dmg\` and drag ChatDelta to Applications
+          - **Linux**: Make the \`.AppImage\` executable and run it, or install the \`.deb\`/\`.rpm\` package
+
+          See the [README](https://github.com/ChatDelta/ChatDelta-Electron#readme) for configuration instructions."
+
+          # Upload all artifacts
+          find release-artifacts -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.exe" -o -name "*.msi" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" \) -exec gh release upload ${{ github.ref_name }} {} \;
